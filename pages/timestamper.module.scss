@@ -1,0 +1,49 @@
+.player {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16/9;
+}
+
+.playerOverlay {
+  background-color: hsl(0, 0%, 13%);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16/9;
+  z-index: 1;
+}
+
+.timestampEvent {
+  animation: fade 0.5s ease-in;
+  border-radius: 5px;
+
+  .timestamp {
+    input {
+      border-radius: 0;
+    }
+
+    input:nth-child(2) {
+      border-inline: none;
+    }
+
+    input:nth-child(1) {
+      border-radius: 5px 0 0 5px;
+    }
+
+    input:nth-child(3) {
+      border-radius: 0 5px 5px 0;
+    }
+  }
+}
+
+// create animation background color from green to transparent
+@keyframes fade {
+  0% {
+    background-color: rgba(0, 255, 0, 0.75);
+  }
+  100% {
+    background-color: transparent;
+  }
+}
