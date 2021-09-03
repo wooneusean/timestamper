@@ -15,6 +15,9 @@ const Timestamp: React.FC<{
   addNewTimestamp: () => void;
 }> = ({ timestampEvent, timestampList, player, isFocused, setTimestampList, addNewTimestamp }) => {
   const eventInputRef = useRef<HTMLInputElement>(null);
+  const hrRef = useRef<HTMLInputElement>(null);
+  const minRef = useRef<HTMLInputElement>(null);
+  const secRef = useRef<HTMLInputElement>(null);
 
   const changeTimestampEvent = (e: React.FormEvent<HTMLInputElement>) => {
     const newTimestampList = [...timestampList];
@@ -74,7 +77,7 @@ const Timestamp: React.FC<{
     if (isFocused) {
       eventInputRef.current?.focus();
     }
-  }, [timestampList]);
+  }, []);
 
   return (
     <Box className={styles.timestampEvent} display='flex'>
@@ -88,9 +91,30 @@ const Timestamp: React.FC<{
         onClick={jumpToTimestamp}
       />
       <Box flex='0 1 32%' display='flex' className={styles.timestamp}>
-        <Input min='0' max='59' type='number' onChange={onHourChanged} value={timestampEvent.timestamp.hours} />
-        <Input min='0' max='59' type='number' onChange={onMinuteChanged} value={timestampEvent.timestamp.minutes} />
-        <Input min='0' max='59' type='number' onChange={onSecondChanged} value={timestampEvent.timestamp.seconds} />
+        <Input
+          ref={hrRef}
+          min='0'
+          max='59'
+          type='number'
+          onInput={onHourChanged}
+          value={timestampEvent.timestamp.hours}
+        />
+        <Input
+          ref={minRef}
+          min='0'
+          max='59'
+          type='number'
+          onInput={onMinuteChanged}
+          value={timestampEvent.timestamp.minutes}
+        />
+        <Input
+          ref={secRef}
+          min='0'
+          max='59'
+          type='number'
+          onInput={onSecondChanged}
+          value={timestampEvent.timestamp.seconds}
+        />
       </Box>
       <Box fontSize='24' style={{ paddingInline: '0.5rem' }}>
         :
