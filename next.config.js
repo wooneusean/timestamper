@@ -2,4 +2,5 @@
 module.exports = {
   reactStrictMode: true,
   basePath: '/timestamper',
+  assetPrefix: '/timestamper/',
 };
