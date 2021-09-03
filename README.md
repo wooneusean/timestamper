@@ -1,8 +1,6 @@
 <p align="center">
-  <img width="256" height="256" src="">
+  <img width="256" height="256" src="https://github.com/euseanwoon2016/timestamper/blob/main/public/images/timestamp.png">
 </p>
-
----
 
 ## Timestamper
 
