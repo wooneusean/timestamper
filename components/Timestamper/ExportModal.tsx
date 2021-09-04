@@ -11,14 +11,12 @@ import {
   Button,
   useToast,
 } from '@chakra-ui/react';
-import React from 'react';
+import React, { useContext } from 'react';
+import { TimestamperContext } from '../../pages';
 
-const ExportModal: React.FC<{ isOpen: boolean; onClose: () => void; generateTimestampExport: () => string }> = ({
-  isOpen,
-  onClose,
-  generateTimestampExport,
-}) => {
+const ExportModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpen, onClose }) => {
   const toast = useToast();
+  const { state, dispatch } = useContext(TimestamperContext);
 
   const copyTimestampExport = () => {
     navigator.clipboard.writeText(generateTimestampExport());
@@ -30,6 +28,26 @@ const ExportModal: React.FC<{ isOpen: boolean; onClose: () => void; generateTime
       duration: 3000,
       isClosable: true,
     });
+  };
+
+  const generateTimestampExport = () => {
+    if (state.timestampList === null) return;
+
+    const newTimestampList = [...state.timestampList];
+
+    const timestampExport = newTimestampList
+      .sort((ts1, ts2) => ts1.timestamp.actualSeconds - ts2.timestamp.actualSeconds)
+      .map((timestamp) => {
+        const {
+          timestamp: { hours, minutes, seconds },
+          event,
+        } = timestamp;
+
+        return `${hours != '00' ? `${hours}:` : ''}${minutes}:${seconds} ${event}`;
+      })
+      .join('\n');
+
+    return timestampExport;
   };
 
   return (

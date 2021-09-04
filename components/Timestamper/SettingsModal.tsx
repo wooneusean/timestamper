@@ -12,21 +12,25 @@ import {
   Tooltip,
   Box,
 } from '@chakra-ui/react';
-import React from 'react';
+import React, { useContext } from 'react';
 import { useCookies } from 'react-cookie';
-import { TimestamperSettings } from '../../pages';
+import { TimestamperActionKind, TimestamperContext, TimestamperSettings } from '../../pages';
 
 const SettingsModal: React.FC<{
   isOpen: boolean;
   onClose: () => void;
-  timestamperSettings: TimestamperSettings;
-  setTimestamperSettings: React.Dispatch<React.SetStateAction<TimestamperSettings>>;
-}> = ({ isOpen, onClose, timestamperSettings, setTimestamperSettings }) => {
+}> = ({ isOpen, onClose }) => {
   const [cookies, setCookie, removeCookie] = useCookies(['timestamps', 'videoId', 'timestamperSettings']);
+  const { state, dispatch } = useContext(TimestamperContext);
 
   const onInputChanged = (e: React.FormEvent<HTMLInputElement>) => {
     const { name, value } = e.currentTarget;
-    setTimestamperSettings({ ...timestamperSettings, [name]: value });
+    const newSettings = { ...state.timestamperSettings, [name]: value };
+    setCookie('timestamperSettings', newSettings);
+    dispatch({
+      type: TimestamperActionKind.SET_TIMESTAMPER_SETTINGS,
+      payload: newSettings,
+    });
   };
 
   const clearCookies = () => {
@@ -50,7 +54,12 @@ const SettingsModal: React.FC<{
                   Time offset (seconds):
                 </Tooltip>
               </Text>
-              <Input type='number' onChange={onInputChanged} name='timeOffset' value={timestamperSettings.timeOffset} />
+              <Input
+                type='number'
+                onChange={onInputChanged}
+                name='timeOffset'
+                value={state.timestamperSettings.timeOffset}
+              />
             </label>
             <Tooltip hasArrow label='Clear all site data such as current video ID, saved timestamps and settings.'>
               <Button onClick={clearCookies} colorScheme='red'>

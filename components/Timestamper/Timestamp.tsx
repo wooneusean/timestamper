@@ -1,76 +1,53 @@
 import { DeleteIcon } from '@chakra-ui/icons';
 import { TiArrowForward } from 'react-icons/ti';
 import { Box, IconButton, Input } from '@chakra-ui/react';
-import React, { useEffect, useRef } from 'react';
-import { TimestampEvent, TimestampTime } from '../../pages';
+import React, { useContext, useEffect, useRef } from 'react';
+import { TimestamperActionKind, TimestamperContext, TimestampEvent, TimestampTime } from '../../pages';
 
-import styles from '../../pages/timestamper.module.scss';
+import styles from './timestamper.module.scss';
 
 const Timestamp: React.FC<{
   timestampEvent: TimestampEvent;
-  timestampList: TimestampEvent[];
-  player: any;
-  isFocused?: boolean;
-  setTimestampList: React.Dispatch<React.SetStateAction<TimestampEvent[]>>;
-  addNewTimestamp: () => void;
-}> = ({ timestampEvent, timestampList, player, isFocused, setTimestampList, addNewTimestamp }) => {
+  isFocused: boolean;
+}> = ({ timestampEvent, isFocused }) => {
+  const { state, dispatch } = useContext(TimestamperContext);
+
   const eventInputRef = useRef<HTMLInputElement>(null);
   const hrRef = useRef<HTMLInputElement>(null);
   const minRef = useRef<HTMLInputElement>(null);
   const secRef = useRef<HTMLInputElement>(null);
 
   const changeTimestampEvent = (e: React.FormEvent<HTMLInputElement>) => {
-    const newTimestampList = [...timestampList];
-    newTimestampList[timestampList.indexOf(timestampEvent)] = {
-      ...timestampEvent,
-      event: e.currentTarget.value,
-    };
-    setTimestampList(newTimestampList);
+    dispatch({
+      type: TimestamperActionKind.UPDATE_TIMESTAMP_EVENT,
+      payload: { timestampEvent, newValue: e.currentTarget.value },
+    });
   };
 
-  const removeTimestampEvent = () => {
-    const newTimestampList = [...timestampList];
-    newTimestampList.splice(timestampList.indexOf(timestampEvent), 1);
-    setTimestampList(newTimestampList);
+  const removeTimestamp = () => {
+    dispatch({
+      type: TimestamperActionKind.REMOVE_TIMESTAMP,
+      payload: timestampEvent,
+    });
   };
 
   const handleEscapeKeydown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Escape') {
-      removeTimestampEvent();
+      removeTimestamp();
     }
   };
 
   const jumpToTimestamp = () => {
-    player.seekTo(timestampEvent.timestamp.actualSeconds);
+    state.player.seekTo(timestampEvent.timestamp.actualSeconds);
   };
 
-  const onHourChanged = (e) => {
-    const newTimestampList = [...timestampList];
-    newTimestampList[timestampList.indexOf(timestampEvent)].timestamp.hours = e.target.value.padStart(2, '0');
-    updateTimestamp(newTimestampList);
-  };
-
-  const onMinuteChanged = (e) => {
-    const newTimestampList = [...timestampList];
-    newTimestampList[timestampList.indexOf(timestampEvent)].timestamp.minutes = e.target.value.padStart(2, '0');
-    updateTimestamp(newTimestampList);
-  };
-
-  const onSecondChanged = (e) => {
-    const newTimestampList = [...timestampList];
-    newTimestampList[timestampList.indexOf(timestampEvent)].timestamp.seconds = e.target.value.padStart(2, '0');
-    updateTimestamp(newTimestampList);
-  };
-
-  const updateTimestamp = (newTimestampList: TimestampEvent[]) => {
-    const newTimestampEvent = newTimestampList[timestampList.indexOf(timestampEvent)];
-    newTimestampEvent.timestamp.actualSeconds = timestampToSeconds(newTimestampEvent.timestamp);
-
-    setTimestampList(newTimestampList);
-  };
-
-  const timestampToSeconds = (timestamp: TimestampTime): number => {
-    return parseInt(timestamp.hours) * 60 * 60 + parseInt(timestamp.minutes) * 60 + parseInt(timestamp.seconds);
+  const onTimestampChange = (e: React.FormEvent<HTMLInputElement>, unit: 'hours' | 'minutes' | 'seconds') => {
+    const newTimestamp = { ...timestampEvent.timestamp };
+    newTimestamp[unit] = parseInt(e.currentTarget.value, 10).toString();
+    dispatch({
+      type: TimestamperActionKind.UPDATE_TIMESTAMP_TIME,
+      payload: { timestampEvent, newTimestamp },
+    });
   };
 
   useEffect(() => {
@@ -96,7 +73,9 @@ const Timestamp: React.FC<{
           min='0'
           max='59'
           type='number'
-          onInput={onHourChanged}
+          onInput={(e) => {
+            onTimestampChange(e, 'hours');
+          }}
           value={timestampEvent.timestamp.hours}
         />
         <Input
@@ -104,7 +83,9 @@ const Timestamp: React.FC<{
           min='0'
           max='59'
           type='number'
-          onInput={onMinuteChanged}
+          onInput={(e) => {
+            onTimestampChange(e, 'minutes');
+          }}
           value={timestampEvent.timestamp.minutes}
         />
         <Input
@@ -112,7 +93,9 @@ const Timestamp: React.FC<{
           min='0'
           max='59'
           type='number'
-          onInput={onSecondChanged}
+          onInput={(e) => {
+            onTimestampChange(e, 'seconds');
+          }}
           value={timestampEvent.timestamp.seconds}
         />
       </Box>
@@ -136,7 +119,7 @@ const Timestamp: React.FC<{
         icon={<DeleteIcon />}
         borderRadius='5px'
         colorScheme='red'
-        onClick={removeTimestampEvent}
+        onClick={removeTimestamp}
       />
     </Box>
   );
