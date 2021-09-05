@@ -9,6 +9,14 @@ export interface TimestampTime {
   seconds: string;
 }
 
+export const timestampIsEqual = (timestamp1: TimestampTime, timestamp2: TimestampTime) => {
+  return (
+    timestamp1.hours === timestamp2.hours &&
+    timestamp1.minutes === timestamp2.minutes &&
+    timestamp1.seconds === timestamp2.seconds
+  );
+};
+
 export interface TimestampEvent {
   timestamp: TimestampTime;
   event: string;
@@ -130,14 +138,21 @@ const reducer = (state: TimestamperState, action: TimestamperAction): Timestampe
     }
 
     case TimestamperActionKind.UPDATE_TIMESTAMP_TIME: {
-      const { timestamp, newTime }: { timestamp: TimestampEvent; newTime: TimestampTime } = action.payload;
-      newTime.actualSeconds = timestampToSeconds(newTime);
+      const {
+        timestampEvent,
+        newTimestamp,
+      }: {
+        timestampEvent: TimestampEvent;
+        newTimestamp: TimestampTime;
+      } = action.payload;
+
+      newTimestamp.actualSeconds = timestampToSeconds(newTimestamp);
 
       const newTimestampList = state.timestampList.map((ts): TimestampEvent => {
-        if (ts === timestamp) {
-          return { ...ts, timestamp: newTime };
+        if (ts === timestampEvent) {
+          return { ...ts, timestamp: newTimestamp };
         }
-        return timestamp;
+        return ts;
       });
 
       return {

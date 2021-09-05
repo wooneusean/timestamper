@@ -127,6 +127,18 @@ const TimestamperRoot = () => {
     if (state.isPlayerReady && state.videoId !== null) {
       state.player.loadVideoById(state.videoId);
     }
+
+    const handleEnterKeydown = (ev) => {
+      if (ev.key === 'Enter') {
+        dispatch({ type: TimestamperActionKind.ADD_TIMESTAMP, payload: '' });
+      }
+    };
+
+    document.addEventListener('keydown', handleEnterKeydown);
+
+    return () => {
+      document.removeEventListener('keydown', handleEnterKeydown);
+    };
   }, [state.isPlayerReady, state.videoId]);
 
   const loadCookies = () => {
@@ -221,13 +233,7 @@ const TimestamperRoot = () => {
                   );
                 } else {
                   return state.timestampList.map((timestamp, index) => {
-                    return (
-                      <Timestamp
-                        key={index}
-                        timestampEvent={timestamp}
-                        isFocused={state.timestampList.length - 1 === index}
-                      />
-                    );
+                    return <Timestamp key={index} timestampEvent={timestamp} />;
                   });
                 }
               })()}

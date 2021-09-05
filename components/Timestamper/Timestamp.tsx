@@ -2,14 +2,17 @@ import { DeleteIcon } from '@chakra-ui/icons';
 import { TiArrowForward } from 'react-icons/ti';
 import { Box, IconButton, Input } from '@chakra-ui/react';
 import React, { useContext, useEffect, useRef } from 'react';
-import { TimestamperActionKind, TimestamperContext, TimestampEvent, TimestampTime } from '../../pages';
+import {
+  TimestamperActionKind,
+  TimestamperContext,
+  TimestampEvent,
+  timestampIsEqual,
+  TimestampTime,
+} from '../../pages';
 
 import styles from './timestamper.module.scss';
 
-const Timestamp: React.FC<{
-  timestampEvent: TimestampEvent;
-  isFocused: boolean;
-}> = ({ timestampEvent, isFocused }) => {
+const Timestamp: React.FC<{ timestampEvent: TimestampEvent }> = ({ timestampEvent }) => {
   const { state, dispatch } = useContext(TimestamperContext);
 
   const eventInputRef = useRef<HTMLInputElement>(null);
@@ -44,6 +47,9 @@ const Timestamp: React.FC<{
   const onTimestampChange = (e: React.FormEvent<HTMLInputElement>, unit: 'hours' | 'minutes' | 'seconds') => {
     const newTimestamp = { ...timestampEvent.timestamp };
     newTimestamp[unit] = parseInt(e.currentTarget.value, 10).toString();
+
+    if (timestampIsEqual(timestampEvent.timestamp, newTimestamp)) return;
+
     dispatch({
       type: TimestamperActionKind.UPDATE_TIMESTAMP_TIME,
       payload: { timestampEvent, newTimestamp },
@@ -51,10 +57,16 @@ const Timestamp: React.FC<{
   };
 
   useEffect(() => {
-    if (isFocused) {
-      eventInputRef.current?.focus();
+    if (document.activeElement !== eventInputRef.current) {
+      eventInputRef.current.focus();
     }
-  }, []);
+  }, [state.timestampList]);
+
+  useEffect(() => {
+    hrRef.current.value = timestampEvent.timestamp.hours.toString().padStart(2, '0');
+    minRef.current.value = timestampEvent.timestamp.minutes.toString().padStart(2, '0');
+    secRef.current.value = timestampEvent.timestamp.seconds.toString().padStart(2, '0');
+  }, [timestampEvent]);
 
   return (
     <Box className={styles.timestampEvent} display='flex'>
@@ -73,30 +85,27 @@ const Timestamp: React.FC<{
           min='0'
           max='59'
           type='number'
-          onInput={(e) => {
+          onBlur={(e) => {
             onTimestampChange(e, 'hours');
           }}
-          value={timestampEvent.timestamp.hours}
         />
         <Input
           ref={minRef}
           min='0'
           max='59'
           type='number'
-          onInput={(e) => {
+          onBlur={(e) => {
             onTimestampChange(e, 'minutes');
           }}
-          value={timestampEvent.timestamp.minutes}
         />
         <Input
           ref={secRef}
           min='0'
           max='59'
           type='number'
-          onInput={(e) => {
+          onBlur={(e) => {
             onTimestampChange(e, 'seconds');
           }}
-          value={timestampEvent.timestamp.seconds}
         />
       </Box>
       <Box fontSize='24' style={{ paddingInline: '0.5rem' }}>
