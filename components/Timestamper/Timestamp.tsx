@@ -57,7 +57,7 @@ const Timestamp: React.FC<{ timestampEvent: TimestampEvent }> = ({ timestampEven
   };
 
   useEffect(() => {
-    if (document.activeElement !== eventInputRef.current) {
+    if (document.activeElement.tagName !== 'INPUT') {
       eventInputRef.current.focus();
     }
   }, [state.timestampList]);
