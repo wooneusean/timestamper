@@ -252,7 +252,7 @@ const TimestamperRoot = () => {
                 Clear
               </Button>
               <iframe
-                src='/external/kofi.html'
+                src={`${process.env.NODE_ENV === 'production' ? '/timestamper' : ''}/external/kofi.html`}
                 style={{ border: 'none', marginBlock: '0.5rem', height: '40px' }}
               ></iframe>
             </Box>
