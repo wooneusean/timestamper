@@ -4,6 +4,6 @@ const isProd = process.env.NODE_ENV === 'production';
 /** @type {import('next').NextConfig} */
 module.exports = {
   reactStrictMode: true,
-  basePath: isProd ? '/timestamper' : '',
-  assetPrefix: isProd ? '/timestamper/' : '',
+  basePath: '',
+  assetPrefix: '',
 };

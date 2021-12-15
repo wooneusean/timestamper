@@ -1,0 +1,2 @@
+#!/bin/bash
+cp -r /home/opc/node_projects/timestamper/out/* /var/www/html/
